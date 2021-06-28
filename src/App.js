@@ -1,6 +1,6 @@
 import "./App.css"
 import {useState, useEffect, useRef} from "react"
-import {numAliveNeighbors} from "./gameFunctions"
+import {shiftBoard, initialiseCells, stepGame} from "./gameFunctions"
 
 function App() {
   const windowWidth = window.innerWidth
@@ -23,7 +23,6 @@ function App() {
     const dragOff = () => setDrag(false)
     document.addEventListener("mousedown", dragOn)
     document.addEventListener("mouseup", dragOff)
-
     return () => {
       document.removeEventListener("mousedown", dragOn)
       document.removeEventListener("mouseup", dragOff)
@@ -32,33 +31,11 @@ function App() {
 
   useEffect(() => {
     //initialise game
-    const populateCells = () => {
-      const d = []
-      for (let i = 0; i < cellsPerRow * cellsPerColumn; i++) {
-        d.push({id: i, isActive: false})
-      }
-      setCells(d)
-    }
-    populateCells()
+    setCells(initialiseCells(cellsPerRow, cellsPerColumn))
   }, [cellsPerColumn, cellsPerRow])
 
   useEffect(() => {
-    function* stepGame() {
-      // yields data for next screen
-      const updatedData = cells.map((c, i) => {
-        const neighbors = numAliveNeighbors(cellsPerRow, cells, i)
-        let isActive = true
-        if (
-          (!c.isActive && neighbors !== 3) ||
-          (c.isActive && (neighbors < 2 || neighbors > 3))
-        ) {
-          isActive = false
-        }
-        return {...c, isActive}
-      })
-      yield updatedData
-    }
-    iterator.current = stepGame()
+    iterator.current = stepGame(cells, cellsPerRow)
   }, [cellsPerRow, cells])
 
   useEffect(() => {
@@ -145,6 +122,36 @@ function App() {
           )
         }}>
         Randomise
+      </button>
+      <button
+        onClick={() => {
+          setCells(cells.map((d) => ({...d, isActive: false})))
+        }}>
+        CLEAR
+      </button>
+      <button
+        onClick={() => {
+          setCells(shiftBoard(cells, false))
+        }}>
+        LEFT
+      </button>
+      <button
+        onClick={() => {
+          setCells(shiftBoard(cells, true))
+        }}>
+        RIGHT
+      </button>
+      <button
+        onClick={() => {
+          setCells(shiftBoard(cells, false, cellsPerRow))
+        }}>
+        UP
+      </button>
+      <button
+        onClick={() => {
+          setCells(shiftBoard(cells, true, cellsPerRow))
+        }}>
+        DOWN
       </button>
     </div>
   )
