@@ -9,7 +9,7 @@ function App() {
   const delay = (d) => new Promise((r) => setTimeout(r, d)) // helper func to delay rendering
   const [delayTime, setDelayTime] = useState(250)
 
-  const cellSize = 25
+  const [cellSize, setCellSize] = useState(25)
   const cellsPerColumn = Math.floor(windowHeight / cellSize) - 4
   const cellsPerRow = Math.floor(windowWidth / cellSize)
   const [cells, setCells] = useState([])
@@ -108,6 +108,14 @@ function App() {
         value={delayTime}
         onChange={(e) => {
           setDelayTime(e.target.value < 20 ? 20 : e.target.value) //
+        }}
+        type="number"
+      />
+      <input
+        disabled={autopilot}
+        value={cellSize}
+        onChange={(e) => {
+          setCellSize(e.target.value < 15 ? 15 : e.target.value) //
         }}
         type="number"
       />
