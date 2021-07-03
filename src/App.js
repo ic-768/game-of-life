@@ -95,11 +95,22 @@ function App() {
           <div
             onMouseOver={() => {
               if (drag && !autopilot) {
-                setCells(cells.map(toggleCell(c)))
+                setCells(cells.map(toggleCell(c.id)))
               }
             }}
+            onTouchMove={(e) => {
+              const touchLocation = e.nativeEvent.changedTouches[0]
+              const touchTarget = document.elementFromPoint(
+                touchLocation.clientX,
+                touchLocation.clientY
+              )
+              const targetId = touchTarget.className.match(/cell.*active (.*)/)
+              targetId &&
+                targetId[1] &&
+                setCells(cells.map(toggleCell(Number(targetId[1]))))
+            }}
             onMouseDown={safeAction(() => {
-              setCells(cells.map(toggleCell(c)))
+              setCells(cells.map(toggleCell(c.id)))
             })}
             style={{
               animation:
@@ -109,7 +120,7 @@ function App() {
               width: `${cellSize}px`,
               height: `${cellSize}px`,
             }}
-            className={`cell ${c.isActive ? "active" : "inactive"}`}
+            className={`cell ${c.isActive ? "active" : "inactive"} ${c.id}`}
             key={i}></div>
         ))}
       </div>

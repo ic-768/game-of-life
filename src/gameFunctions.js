@@ -15,11 +15,11 @@ export const randomiseCells = (currentCell) =>
 /**
  * A map function to toggle a single cell
  */
-export const toggleCell = (targetCell) => (cellBeingChecked) =>
-  cellBeingChecked.id !== targetCell.id
+export const toggleCell = (targetId) => (cellBeingChecked) => {
+  return cellBeingChecked.id !== targetId
     ? cellBeingChecked
-    : {...targetCell, isActive: !targetCell.isActive}
-
+    : {...cellBeingChecked, isActive: !cellBeingChecked.isActive}
+}
 /**
  * A map function to reset all cells
  */
