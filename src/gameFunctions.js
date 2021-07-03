@@ -77,3 +77,21 @@ export const shiftBoard = (arr, reverse, rowLength = 1) => {
   }
   return newArr
 }
+
+/**
+ * To get id of a cell when using touch devices
+ */
+export const getCellIdFromTouch = (e) => {
+  const touchLocation = e.nativeEvent.changedTouches[0]
+  const touchTarget = document.elementFromPoint(
+    touchLocation.clientX,
+    touchLocation.clientY
+  )
+  if (touchTarget) {
+    const targetId = touchTarget.className.match(/cell.*active (.*)/)
+    if (targetId && Number(targetId[1]) !== null) {
+      return Number(targetId[1])
+    }
+  }
+  return null
+}

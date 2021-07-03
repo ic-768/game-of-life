@@ -7,6 +7,7 @@ import {
   toggleCell,
   stepGame,
   shiftBoard,
+  getCellIdFromTouch,
 } from "./gameFunctions"
 import LabelledButton from "./LabelledButton"
 import IconButton from "./IconButton"
@@ -99,15 +100,8 @@ function App() {
               }
             }}
             onTouchMove={(e) => {
-              const touchLocation = e.nativeEvent.changedTouches[0]
-              const touchTarget = document.elementFromPoint(
-                touchLocation.clientX,
-                touchLocation.clientY
-              )
-              const targetId = touchTarget.className.match(/cell.*active (.*)/)
-              targetId &&
-                targetId[1] &&
-                setCells(cells.map(toggleCell(Number(targetId[1]))))
+              const cellID = getCellIdFromTouch(e)
+              cellID && setCells(cells.map(toggleCell(cellID)))
             }}
             onMouseDown={safeAction(() => {
               setCells(cells.map(toggleCell(c.id)))
