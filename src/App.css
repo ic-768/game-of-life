@@ -1,6 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
+
 * {
+  touch-action: none;
+  font-family: "Roboto", sans-serif;
   margin: 0px;
   padding: 0px;
+  color: #ffffff;
+}
+body {
+  background-color: #404e4d;
 }
 
 .cell {
@@ -8,7 +16,7 @@
 }
 
 .cell.active {
-  background-color: white;
+  background-color: #cda00d;
 }
 
 .cell.inactive {
@@ -16,9 +24,115 @@
 }
 
 .grid {
-  background-color: black;
+  margin-top: 35px;
+  background-color: #404e4d;
   flex-wrap: wrap;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  right: 0;
+  left: 0;
+  transition: top 0.65s;
+  position: absolute;
+  background-color: #404e4d;
+}
+
+.toolbar.expanded {
+  top: 0;
+}
+
+.toolbar.collapsed {
+  top: -122px;
+  right: 0;
+  left: 0;
+}
+
+.controls-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px 0px;
+}
+
+.button-group {
+  min-height: 80px;
+  background-color: #000000;
+  padding: 8px;
+  border-radius: 8px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.delay-input-container {
+  background-color: #ffffff;
+  border: 1px solid gray;
+  padding-left: 8px;
+  align-items: center;
+  border-radius: 4px;
+  display: flex;
+  min-height: 25px;
+}
+
+.delay-input {
+  color: black;
+  height: 100%;
+  background-color: #ffffff;
+  padding-left: 20px;
+  border: none;
+}
+
+.playbutton.play i:before {
+  color: green;
+}
+
+.playbutton.stop i:before {
+  color: red;
+}
+
+i:before {
+  font-size: 20px;
+  color: #000000;
+}
+
+@media (max-width: 660px) {
+  .toolbar.collapsed {
+    top: -115px;
+    right: 0;
+    left: 0;
+  }
+  i:before {
+    font-size: 14px;
+  }
+  .toolbar {
+    padding: 5px 0px;
+  }
+}
+
+@media (max-width: 561px) {
+  .game-speed-container {
+    width: 100px;
+    align-items: center;
+    justify-content: center;
+  }
+  .delay-input-container {
+    width: 90px;
+  }
+  .delay-input {
+    width: 50px;
+  }
+}
+
+@media (max-width: 438px) {
+  button {
+    width: 100%;
+  }
 }

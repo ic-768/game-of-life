@@ -10,7 +10,8 @@ function App() {
   const [delayTime, setDelayTime] = useState(250)
 
   const [cellSize, setCellSize] = useState(25)
-  const cellsPerColumn = Math.floor(windowHeight / cellSize) - 4
+  const [toolbarIsExpanded, setToolbarIsExpanded] = useState(true)
+  const cellsPerColumn = Math.floor(windowHeight / cellSize) - 1
   const cellsPerRow = Math.floor(windowWidth / cellSize)
   const [cells, setCells] = useState([])
 
@@ -48,6 +49,15 @@ function App() {
     }
   }, [autopilot, cells, delayTime])
 
+  //Prevent updates while game is running
+  const safeAction = (action) => () => {
+    if (autopilot) {
+      setAutopilot(false)
+    } else {
+      action()
+    }
+  }
+
   return (
     <div className="App">
       <div
@@ -68,19 +78,13 @@ function App() {
                 )
               }
             }}
-            onMouseDown={
-              autopilot
-                ? () => {
-                    setAutopilot(false)
-                  }
-                : () => {
-                    setCells(
-                      cells.map((d) =>
-                        d.id !== c.id ? d : {...d, isActive: !d.isActive}
-                      )
-                    )
-                  }
-            }
+            onMouseDown={safeAction(() => {
+              setCells(
+                cells.map((d) =>
+                  d.id !== c.id ? d : {...d, isActive: !d.isActive}
+                )
+              )
+            })}
             style={{
               display: "inline",
               width: `${cellSize}px`,
@@ -90,77 +94,111 @@ function App() {
             key={i}></div>
         ))}
       </div>
-      <button
-        onClick={() => {
-          setCells(iterator.current.next().value)
-        }}>
-        SINGLE STEP
-      </button>
-      <button
-        style={{backgroundColor: autopilot ? "green" : "red"}}
-        onClick={async () => {
-          setAutopilot(!autopilot)
-        }}>
-        AUTOPILOT
-      </button>
-      <input
-        disabled={autopilot}
-        value={delayTime}
-        onChange={(e) => {
-          setDelayTime(e.target.value < 20 ? 20 : e.target.value) //
-        }}
-        type="number"
-      />
-      <input
-        disabled={autopilot}
-        value={cellSize}
-        onChange={(e) => {
-          setCellSize(e.target.value < 15 ? 15 : e.target.value) //
-        }}
-        type="number"
-      />
-      <button
-        onClick={() => {
-          setCells(
-            cells.map((d) =>
-              Math.random() > 0.8
-                ? {...d, isActive: true}
-                : {...d, isActive: false}
-            )
-          )
-        }}>
-        Randomise
-      </button>
-      <button
-        onClick={() => {
-          setCells(cells.map((d) => ({...d, isActive: false})))
-        }}>
-        CLEAR
-      </button>
-      <button
-        onClick={() => {
-          setCells(shiftBoard(cells, false))
-        }}>
-        LEFT
-      </button>
-      <button
-        onClick={() => {
-          setCells(shiftBoard(cells, true))
-        }}>
-        RIGHT
-      </button>
-      <button
-        onClick={() => {
-          setCells(shiftBoard(cells, false, cellsPerRow))
-        }}>
-        UP
-      </button>
-      <button
-        onClick={() => {
-          setCells(shiftBoard(cells, true, cellsPerRow))
-        }}>
-        DOWN
-      </button>
+      <div
+        className={`toolbar ${toolbarIsExpanded ? "expanded" : "collapsed"}`}>
+        <div className="controls-container">
+          <div className="button-group">
+            <label>Play</label>
+            <div>
+              <button
+                onClick={() => {
+                  setCells(iterator.current.next().value)
+                }}>
+                <i className="fa fa-step-forward" aria-hidden="true"></i>
+              </button>
+              <button
+                className={`playbutton ${autopilot ? "stop" : "play"}`}
+                onClick={async () => {
+                  setAutopilot(!autopilot)
+                }}>
+                {autopilot ? (
+                  <i className="fa fa-pause-circle" aria-hidden="true"></i>
+                ) : (
+                  <i className="fa fa-fast-forward" aria-hidden="true"></i>
+                )}
+              </button>
+            </div>
+          </div>
+          <div className="button-group game-speed-container">
+            <label>Time between Renders</label>
+            <div className="delay-input-container">
+              <i className="fa fa-tachometer" aria-hidden="true"></i>
+              <input
+                className="delay-input"
+                value={delayTime}
+                onFocus={() => {
+                  autopilot && setAutopilot(false)
+                }}
+                onChange={(e) => {
+                  setDelayTime(e.target.value < 20 ? 20 : e.target.value)
+                }}
+                type="number"
+              />
+            </div>
+          </div>
+          <div className="button-group">
+            <label>Board</label>
+            <div>
+              <button
+                onClick={safeAction(() => {
+                  setCells(
+                    cells.map((d) =>
+                      Math.random() > 0.8
+                        ? {...d, isActive: true}
+                        : {...d, isActive: false}
+                    )
+                  )
+                })}>
+                <i className="fa fa-random" aria-hidden="true"></i>
+              </button>
+              <button
+                onClick={safeAction(() => {
+                  setCells(cells.map((d) => ({...d, isActive: false})))
+                })}>
+                <i className="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div className="button-group">
+            <button
+              onClick={safeAction(() => {
+                setCells(shiftBoard(cells, false, cellsPerRow))
+              })}>
+              <i className="fa fa-arrow-up"></i>
+            </button>
+            <div>
+              <button
+                onClick={safeAction(() => {
+                  setCells(shiftBoard(cells, false))
+                })}>
+                <i className="fa fa-arrow-left"></i>
+              </button>
+              <button
+                onClick={safeAction(() => {
+                  setCells(shiftBoard(cells, true))
+                })}>
+                <i className="fa fa-arrow-right"></i>
+              </button>
+            </div>
+            <button
+              onClick={safeAction(() => {
+                setCells(shiftBoard(cells, true, cellsPerRow))
+              })}>
+              <i className="fa fa-arrow-down"></i>
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            setToolbarIsExpanded(!toolbarIsExpanded)
+          }}>
+          {toolbarIsExpanded ? (
+            <i className="fa fa-chevron-up" aria-hidden="true"></i>
+          ) : (
+            <i className="fa fa-chevron-down" aria-hidden="true"></i>
+          )}
+        </button>
+      </div>
     </div>
   )
 }
