@@ -1,18 +1,28 @@
 import "./App.css"
 import {useState, useEffect, useRef} from "react"
-import {shiftBoard, initialiseCells, stepGame} from "./gameFunctions"
+import {
+  initialiseCells,
+  randomiseCells,
+  resetCells,
+  toggleCell,
+  stepGame,
+  shiftBoard,
+} from "./gameFunctions"
 import LabelledButton from "./LabelledButton"
 import IconButton from "./IconButton"
+import LabelledInput from "./LabelledInput"
 
 function App() {
   const windowWidth = window.innerWidth
   const windowHeight = window.innerHeight
+  const [toolbarIsExpanded, setToolbarIsExpanded] = useState(true)
 
   const delay = (d) => new Promise((r) => setTimeout(r, d)) // helper func to delay rendering
-  const [delayTime, setDelayTime] = useState(100)
+  const [delayTime, setDelayTime] = useState(30)
 
-  const [cellSize, setCellSize] = useState(25)
-  const [toolbarIsExpanded, setToolbarIsExpanded] = useState(true)
+  const [transitionTime, setTransitionTime] = useState(1) //time for cell fade-in/out
+
+  const [cellSize, setCellSize] = useState(40)
   const cellsPerColumn = Math.floor(windowHeight / cellSize) - 1
   const cellsPerRow = Math.floor(windowWidth / cellSize)
   const [cells, setCells] = useState([])
@@ -61,7 +71,7 @@ function App() {
 
   /**
    *Prevent updates while game is running
-   *(Not needed since buttons are disabled when running the game - but good to keep around)
+   *(Not really needed since buttons are disabled when running the game - but good to keep around)
    */
   const safeAction = (action) => () => {
     if (autopilot) {
@@ -84,22 +94,15 @@ function App() {
           <div
             onMouseOver={() => {
               if (drag && !autopilot) {
-                setCells(
-                  cells.map((d) =>
-                    d.id !== c.id ? d : {...d, isActive: !d.isActive}
-                  )
-                )
+                setCells(cells.map(toggleCell(c)))
               }
             }}
             onMouseDown={safeAction(() => {
-              setCells(
-                cells.map((d) =>
-                  d.id !== c.id ? d : {...d, isActive: !d.isActive}
-                )
-              )
+              setCells(cells.map(toggleCell(c)))
             })}
             style={{
-              display: "inline",
+              animation: c.isActive && `forwards fade-in ${transitionTime}s`,
+              transition: `${transitionTime}s`,
               width: `${cellSize}px`,
               height: `${cellSize}px`,
             }}
@@ -129,22 +132,36 @@ function App() {
               }}
             />
           </div>
-          <div className="button-group vertical game-speed-container">
-            <label>Time between renders</label>
-            <div className="delay-input-container">
-              <i className="fa fa-tachometer" aria-hidden="true"></i>
-              <input
-                className="delay-input"
-                value={delayTime}
-                onFocus={() => {
-                  autopilot && setAutopilot(false)
-                }}
-                onChange={(e) => {
+          <div className="time-control-container">
+            <LabelledInput
+              label="Render time"
+              value={delayTime}
+              className="delay-input"
+              iconName="fa fa-tachometer"
+              onFocus={() => {
+                autopilot && setAutopilot(false)
+              }}
+              onChange={(e) =>
+                safeAction(() =>
                   setDelayTime(e.target.value < 20 ? 20 : e.target.value)
-                }}
-                type="number"
-              />
-            </div>
+                )()
+              }
+            />
+            <LabelledInput
+              label="Transition time"
+              value={transitionTime}
+              className="transition-input"
+              iconName="fa fa-clock-o"
+              onChange={(e) =>
+                setTransitionTime(
+                  e.target.value > 10
+                    ? 10
+                    : e.target.value < 0
+                    ? 0
+                    : e.target.value
+                )
+              }
+            />
           </div>
           <div className="button-group">
             <LabelledButton
@@ -152,13 +169,7 @@ function App() {
               className="shuffle-button"
               iconName="fa fa-random"
               onClick={safeAction(() => {
-                setCells(
-                  cells.map((d) =>
-                    Math.random() > 0.8
-                      ? {...d, isActive: true}
-                      : {...d, isActive: false}
-                  )
-                )
+                setCells(cells.map(randomiseCells))
               })}
               disabled={autopilot}
             />
@@ -167,7 +178,7 @@ function App() {
               className="clear-button"
               iconName="fa fa-trash"
               onClick={safeAction(() => {
-                setCells(cells.map((d) => ({...d, isActive: false})))
+                setCells(cells.map(resetCells))
               })}
               disabled={autopilot}
             />

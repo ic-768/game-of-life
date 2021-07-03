@@ -1,9 +1,29 @@
 export const initialiseCells = (cellsPerRow, cellsPerColumn) =>
-  //spawn all cells as inactive
   Array.from({length: cellsPerRow * cellsPerColumn}, (_, i) => ({
     id: i,
     isActive: false,
   }))
+
+/**
+ * A map function to randomise all cells
+ */
+export const randomiseCells = (currentCell) =>
+  Math.random() > 0.8
+    ? {...currentCell, isActive: true}
+    : {...currentCell, isActive: false}
+
+/**
+ * A map function to toggle a single cell
+ */
+export const toggleCell = (targetCell) => (cellBeingChecked) =>
+  cellBeingChecked.id !== targetCell.id
+    ? cellBeingChecked
+    : {...targetCell, isActive: !targetCell.isActive}
+
+/**
+ * A map function to reset all cells
+ */
+export const resetCells = (c) => ({...c, isActive: false})
 
 /**
  * Used to determine whether a cell lives or dies on next render
