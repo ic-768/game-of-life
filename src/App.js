@@ -101,7 +101,9 @@ function App() {
               setCells(cells.map(toggleCell(c)))
             })}
             style={{
-              animation: c.isActive && `forwards fade-in ${transitionTime}s`,
+              animation:
+                (c.isActive && `forwards fade-in ${transitionTime}s`) ||
+                (!c.isActive && `forwards fade-out ${transitionTime}s`),
               transition: `${transitionTime}s`,
               width: `${cellSize}px`,
               height: `${cellSize}px`,

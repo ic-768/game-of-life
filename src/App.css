@@ -9,9 +9,19 @@
   }
 }
 
+@keyframes fade-out {
+  from {
+    background-color: white;
+  }
+  to {
+    background-color: black;
+  }
+}
+
 :root {
   --background-color: #404e4d;
   --cell-color-inactive: #000000;
+  --cell-color-active: #ffffff;
 }
 
 * {
@@ -47,6 +57,7 @@ label {
 
 .cell.active {
   box-shadow: 0px 0px 4px white;
+  background-color: var(--cell-color-active);
 }
 .cell.inactive {
   background-color: var(--cell-color-inactive);
