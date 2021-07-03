@@ -1,13 +1,15 @@
 import "./App.css"
 import {useState, useEffect, useRef} from "react"
 import {shiftBoard, initialiseCells, stepGame} from "./gameFunctions"
+import LabelledButton from "./LabelledButton"
+import IconButton from "./IconButton"
 
 function App() {
   const windowWidth = window.innerWidth
   const windowHeight = window.innerHeight
 
   const delay = (d) => new Promise((r) => setTimeout(r, d)) // helper func to delay rendering
-  const [delayTime, setDelayTime] = useState(250)
+  const [delayTime, setDelayTime] = useState(100)
 
   const [cellSize, setCellSize] = useState(25)
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(true)
@@ -30,15 +32,23 @@ function App() {
     }
   }, [])
 
+  /**
+   * Initialise game
+   */
   useEffect(() => {
-    //initialise game
     setCells(initialiseCells(cellsPerRow, cellsPerColumn))
   }, [cellsPerColumn, cellsPerRow])
 
+  /**
+   * Bind ref to game generator
+   */
   useEffect(() => {
     iterator.current = stepGame(cells, cellsPerRow)
   }, [cellsPerRow, cells])
 
+  /**
+   * Play game
+   */
   useEffect(() => {
     const runGame = async () => {
       await delay(delayTime)
@@ -49,7 +59,10 @@ function App() {
     }
   }, [autopilot, cells, delayTime])
 
-  //Prevent updates while game is running
+  /**
+   *Prevent updates while game is running
+   *(Not needed since buttons are disabled when running the game - but good to keep around)
+   */
   const safeAction = (action) => () => {
     if (autopilot) {
       setAutopilot(false)
@@ -98,29 +111,26 @@ function App() {
         className={`toolbar ${toolbarIsExpanded ? "expanded" : "collapsed"}`}>
         <div className="controls-container">
           <div className="button-group">
-            <label>Play</label>
-            <div>
-              <button
-                onClick={() => {
-                  setCells(iterator.current.next().value)
-                }}>
-                <i className="fa fa-step-forward" aria-hidden="true"></i>
-              </button>
-              <button
-                className={`playbutton ${autopilot ? "stop" : "play"}`}
-                onClick={async () => {
-                  setAutopilot(!autopilot)
-                }}>
-                {autopilot ? (
-                  <i className="fa fa-pause-circle" aria-hidden="true"></i>
-                ) : (
-                  <i className="fa fa-fast-forward" aria-hidden="true"></i>
-                )}
-              </button>
-            </div>
+            <LabelledButton
+              label="Step"
+              className="step-button"
+              iconName="fa fa-step-forward"
+              onClick={() => {
+                setCells(iterator.current.next().value)
+              }}
+              disabled={autopilot}
+            />
+            <LabelledButton
+              label="Play"
+              className={`play-button ${autopilot ? "stop" : "play"}`}
+              iconName={autopilot ? "fa fa-pause-circle" : "fa fa-fast-forward"}
+              onClick={async () => {
+                setAutopilot(!autopilot)
+              }}
+            />
           </div>
-          <div className="button-group game-speed-container">
-            <label>Time between Renders</label>
+          <div className="button-group vertical game-speed-container">
+            <label>Time between renders</label>
             <div className="delay-input-container">
               <i className="fa fa-tachometer" aria-hidden="true"></i>
               <input
@@ -137,67 +147,77 @@ function App() {
             </div>
           </div>
           <div className="button-group">
-            <label>Board</label>
-            <div>
-              <button
-                onClick={safeAction(() => {
-                  setCells(
-                    cells.map((d) =>
-                      Math.random() > 0.8
-                        ? {...d, isActive: true}
-                        : {...d, isActive: false}
-                    )
+            <LabelledButton
+              label="Shuffle"
+              className="shuffle-button"
+              iconName="fa fa-random"
+              onClick={safeAction(() => {
+                setCells(
+                  cells.map((d) =>
+                    Math.random() > 0.8
+                      ? {...d, isActive: true}
+                      : {...d, isActive: false}
                   )
-                })}>
-                <i className="fa fa-random" aria-hidden="true"></i>
-              </button>
-              <button
-                onClick={safeAction(() => {
-                  setCells(cells.map((d) => ({...d, isActive: false})))
-                })}>
-                <i className="fa fa-trash" aria-hidden="true"></i>
-              </button>
-            </div>
+                )
+              })}
+              disabled={autopilot}
+            />
+            <LabelledButton
+              label="Clear"
+              className="clear-button"
+              iconName="fa fa-trash"
+              onClick={safeAction(() => {
+                setCells(cells.map((d) => ({...d, isActive: false})))
+              })}
+              disabled={autopilot}
+            />
           </div>
-          <div className="button-group">
-            <button
+          <div className="button-group vertical">
+            <IconButton
+              className="shift-up-button"
+              iconName="fa fa-arrow-up"
               onClick={safeAction(() => {
                 setCells(shiftBoard(cells, false, cellsPerRow))
-              })}>
-              <i className="fa fa-arrow-up"></i>
-            </button>
+              })}
+              disabled={autopilot}
+            />
             <div>
-              <button
+              <IconButton
+                className="shift-left-button"
+                iconName="fa fa-arrow-left"
                 onClick={safeAction(() => {
                   setCells(shiftBoard(cells, false))
-                })}>
-                <i className="fa fa-arrow-left"></i>
-              </button>
-              <button
+                })}
+                disabled={autopilot}
+              />
+              <IconButton
+                className="shift-right-button"
+                iconName="fa fa-arrow-right"
                 onClick={safeAction(() => {
                   setCells(shiftBoard(cells, true))
-                })}>
-                <i className="fa fa-arrow-right"></i>
-              </button>
+                })}
+                disabled={autopilot}
+              />
             </div>
-            <button
+            <IconButton
+              className="shift-down-button"
+              iconName="fa fa-arrow-down"
               onClick={safeAction(() => {
                 setCells(shiftBoard(cells, true, cellsPerRow))
-              })}>
-              <i className="fa fa-arrow-down"></i>
-            </button>
+              })}
+              disabled={autopilot}
+            />
           </div>
         </div>
-        <button
+        <IconButton
+          className="expand-collapse-button"
+          iconName={
+            toolbarIsExpanded ? "fa fa-chevron-up" : "fa fa-chevron-down"
+          }
           onClick={() => {
             setToolbarIsExpanded(!toolbarIsExpanded)
-          }}>
-          {toolbarIsExpanded ? (
-            <i className="fa fa-chevron-up" aria-hidden="true"></i>
-          ) : (
-            <i className="fa fa-chevron-down" aria-hidden="true"></i>
-          )}
-        </button>
+          }}
+        />
       </div>
     </div>
   )

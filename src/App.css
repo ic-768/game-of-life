@@ -1,5 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
 
+:root {
+  --background-color: #404e4d;
+  --cell-color-active: #cda00d;
+  --cell-color-inactive: #000000;
+}
+
 * {
   touch-action: none;
   font-family: "Roboto", sans-serif;
@@ -7,8 +13,23 @@
   padding: 0px;
   color: #ffffff;
 }
+
 body {
-  background-color: #404e4d;
+  background-color: var(--background-color);
+}
+
+label {
+  font-size: 17px;
+  color: black;
+}
+
+.grid {
+  margin-top: 35px;
+  background-color: var(--background-color);
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cell {
@@ -16,41 +37,57 @@ body {
 }
 
 .cell.active {
-  background-color: #cda00d;
+  background-color: var(--cell-color-active);
 }
 
 .cell.inactive {
-  background-color: black;
-}
-
-.grid {
-  margin-top: 35px;
-  background-color: #404e4d;
-  flex-wrap: wrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-color: var(--cell-color-inactive);
 }
 
 .toolbar {
+  background-color: var(--background-color);
   display: flex;
   flex-direction: column;
   align-items: center;
   right: 0;
   left: 0;
-  transition: top 0.65s;
+  transition: all 0.65s;
   position: absolute;
-  background-color: #404e4d;
 }
 
 .toolbar.expanded {
+  box-shadow: 0px 2px 50px black;
   top: 0;
 }
 
 .toolbar.collapsed {
+  box-shadow: 0;
   top: -122px;
   right: 0;
   left: 0;
+}
+
+.button-group {
+  background-color: #d3d3d3;
+  min-height: 80px;
+  border: 1px solid black;
+  box-shadow: 0px 0px 10px black;
+  padding: 8px;
+  border-radius: 8px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.button-group.vertical {
+  flex-direction: column;
+}
+
+.labelled-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .controls-container {
@@ -59,17 +96,6 @@ body {
   justify-content: space-around;
   align-items: center;
   padding: 5px 0px;
-}
-
-.button-group {
-  min-height: 80px;
-  background-color: #000000;
-  padding: 8px;
-  border-radius: 8px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  display: flex;
 }
 
 .delay-input-container {
@@ -90,12 +116,21 @@ body {
   border: none;
 }
 
-.playbutton.play i:before {
+.play-button.container,
+.clear-button.container {
+  margin-left: 10px;
+}
+
+.play-button.play i:before {
   color: green;
 }
 
-.playbutton.stop i:before {
+.play-button.stop i:before {
   color: red;
+}
+
+button.disabled i:before {
+  color: gray;
 }
 
 i:before {
