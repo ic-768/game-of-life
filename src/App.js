@@ -85,6 +85,7 @@ function App() {
     <div className="App">
       <div
         className="grid"
+        onDragStart={(event) => event.preventDefault()}
         style={{
           width: `${windowWidth}px`,
           gridTemplateColumns: `repeat(${cellsPerRow},1fr)`,
