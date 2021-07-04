@@ -101,7 +101,10 @@ function App() {
             }}
             onTouchMove={(e) => {
               const cellID = getCellIdFromTouch(e)
-              cellID && setCells(cells.map(toggleCell(cellID)))
+              cellID &&
+                safeAction(() => {
+                  setCells(cells.map(toggleCell(cellID)))
+                })
             }}
             onMouseDown={safeAction(() => {
               setCells(cells.map(toggleCell(c.id)))

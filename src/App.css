@@ -1,19 +1,19 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap");
 
 @keyframes fade-in {
-  from {
+  0% {
     background-color: lime;
   }
-  to {
+  100% {
     background-color: white;
   }
 }
 
 @keyframes fade-out {
-  from {
+  0% {
     background-color: white;
   }
-  to {
+  100% {
     background-color: black;
   }
 }
@@ -122,7 +122,7 @@ label {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 5px 0px;
+  padding: 8px 0px;
 }
 
 .transition-input-container,
