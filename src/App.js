@@ -137,7 +137,7 @@ function App() {
             <LabelledButton
               label="Play"
               className={`play-button ${autopilot ? "stop" : "play"}`}
-              iconName={autopilot ? "fa fa-pause-circle" : "fa fa-fast-forward"}
+              iconName={autopilot ? "fa fa-pause" : "fa fa-play"}
               onClick={async () => {
                 setAutopilot(!autopilot)
               }}
@@ -153,9 +153,7 @@ function App() {
                 autopilot && setAutopilot(false)
               }}
               onChange={(e) =>
-                safeAction(() =>
-                  setDelayTime(e.target.value < 20 ? 20 : e.target.value)
-                )()
+                safeAction(() => setDelayTime(Math.max(e.target.value, 20)))()
               }
             />
             <LabelledInput
@@ -163,15 +161,11 @@ function App() {
               value={transitionTime}
               className="transition-input"
               iconName="fa fa-clock-o"
-              onChange={(e) =>
+              onChange={(e) => {
                 setTransitionTime(
-                  e.target.value > 10
-                    ? 10
-                    : e.target.value < 0
-                    ? 0
-                    : e.target.value
+                  e.target.value > 0 ? Math.min(e.target.value, 10) : 0
                 )
-              }
+              }}
             />
           </div>
           <div className="button-group">
