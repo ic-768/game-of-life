@@ -81,7 +81,7 @@ label {
 
 .toolbar.collapsed {
   box-shadow: 0;
-  top: -122px;
+  top: -128px;
   right: 0;
   left: 0;
 }
@@ -180,8 +180,21 @@ i:before {
     padding: 5px 0px;
   }
 }
+@media (max-width: 660px) {
+  .toolbar.collapsed {
+    top: -134px;
+  }
+}
+@media (max-width: 598px) {
+  .toolbar.collapsed {
+    top: -145px;
+  }
+}
 
 @media (max-width: 561px) {
+  .toolbar.collapsed {
+    top: -158px;
+  }
   .time-control-container {
     width: 100px;
     align-items: center;
