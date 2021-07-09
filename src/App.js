@@ -1,36 +1,24 @@
 import "./App.css"
-import {useState, useEffect, useRef} from "react"
+import useGameOfLife from "./useGameOfLife"
+import {useState, useEffect} from "react"
 import {
-  initialiseCells,
   randomiseCells,
   resetCells,
   toggleCell,
-  stepGame,
   shiftBoard,
   getCellIdFromTouch,
 } from "./gameFunctions"
-import LabelledButton from "./LabelledButton"
 import IconButton from "./IconButton"
 import LabelledInput from "./LabelledInput"
 
 function App() {
   const windowWidth = window.innerWidth
-  const windowHeight = window.innerHeight
+
   const [toolbarIsExpanded, setToolbarIsExpanded] = useState(true)
-
-  const delay = (d) => new Promise((r) => setTimeout(r, d)) // helper func to delay rendering
-  const [delayTime, setDelayTime] = useState(30)
-
   const [transitionTime, setTransitionTime] = useState(1) //time for cell fade-in/out
-
-  const [cellSize, setCellSize] = useState(40)
-  const cellsPerColumn = Math.floor(windowHeight / cellSize) - 1
-  const cellsPerRow = Math.floor(windowWidth / cellSize)
-  const [cells, setCells] = useState([])
-
-  const [autopilot, setAutopilot] = useState(false) // if on, run game at delayTime intervals
   const [drag, setDrag] = useState(false) // to change state of cells on drag
-  const iterator = useRef() // is bound to generator for receiving game data
+
+  const game = useGameOfLife()
 
   useEffect(() => {
     const dragOn = () => setDrag(true)
@@ -44,39 +32,12 @@ function App() {
   }, [])
 
   /**
-   * Initialise game
-   */
-  useEffect(() => {
-    setCells(initialiseCells(cellsPerRow, cellsPerColumn))
-  }, [cellsPerColumn, cellsPerRow])
-
-  /**
-   * Bind ref to game generator
-   */
-  useEffect(() => {
-    iterator.current = stepGame(cells, cellsPerRow)
-  }, [cellsPerRow, cells])
-
-  /**
-   * Play game
-   */
-  useEffect(() => {
-    const runGame = async () => {
-      await delay(delayTime)
-      setCells(iterator.current.next().value || cells)
-    }
-    if (autopilot) {
-      runGame()
-    }
-  }, [autopilot, cells, delayTime])
-
-  /**
    *Prevent updates while game is running
    *(Not really needed since buttons are disabled when running the game - but good to keep around)
    */
   const safeAction = (action) => () => {
-    if (autopilot) {
-      setAutopilot(false)
+    if (game.autopilot) {
+      game.setAutopilot(false)
     } else {
       action()
     }
@@ -89,33 +50,33 @@ function App() {
         onDragStart={(event) => event.preventDefault()}
         style={{
           width: `${windowWidth}px`,
-          gridTemplateColumns: `repeat(${cellsPerRow},1fr)`,
-          gridTemplateRows: `repeat(${cellsPerColumn},1fr)`,
+          gridTemplateColumns: `repeat(${game.cellsPerRow},1fr)`,
+          gridTemplateRows: `repeat(${game.cellsPerColumn},1fr)`,
         }}>
-        {cells.map((c, i) => (
+        {game.cells.map((c, i) => (
           <div
             onMouseOver={() => {
-              if (drag && !autopilot) {
-                setCells(cells.map(toggleCell(c.id)))
+              if (drag && !game.autopilot) {
+                game.setCells(game.cells.map(toggleCell(c.id)))
               }
             }}
             onTouchMove={(e) => {
               const cellID = getCellIdFromTouch(e)
               cellID &&
                 safeAction(() => {
-                  setCells(cells.map(toggleCell(cellID)))
+                  game.setCells(game.cells.map(toggleCell(cellID)))
                 })
             }}
             onMouseDown={safeAction(() => {
-              setCells(cells.map(toggleCell(c.id)))
+              game.setCells(game.cells.map(toggleCell(c.id)))
             })}
             style={{
               animation:
                 (c.isActive && `forwards fade-in ${transitionTime}s`) ||
                 (!c.isActive && `forwards fade-out ${transitionTime}s`),
               transition: `${transitionTime}s`,
-              width: `${cellSize}px`,
-              height: `${cellSize}px`,
+              width: `${game.cellSize}px`,
+              height: `${game.cellSize}px`,
             }}
             className={`cell ${c.isActive ? "active" : "inactive"} ${c.id}`}
             key={i}></div>
@@ -124,104 +85,118 @@ function App() {
       <div
         className={`toolbar ${toolbarIsExpanded ? "expanded" : "collapsed"}`}>
         <div className="controls-container">
-          <div className="button-group">
-            <LabelledButton
-              label="Step"
-              className="step-button"
-              iconName="fa fa-step-forward"
-              onClick={() => {
-                setCells(iterator.current.next().value)
-              }}
-              disabled={autopilot}
-            />
-            <LabelledButton
-              label="Play"
-              className={`play-button ${autopilot ? "stop" : "play"}`}
-              iconName={autopilot ? "fa fa-pause" : "fa fa-play"}
-              onClick={async () => {
-                setAutopilot(!autopilot)
-              }}
-            />
-          </div>
           <div className="time-control-container">
             <LabelledInput
               label="Render time"
-              value={delayTime}
-              className="delay-input"
+              type="range"
+              min={10}
+              max={1000}
+              value={game.delayTime}
+              className="transition-input"
               iconName="fa fa-tachometer"
               onFocus={() => {
-                autopilot && setAutopilot(false)
+                game.autopilot && game.setAutopilot(false)
               }}
               onChange={(e) =>
-                safeAction(() => setDelayTime(Math.max(e.target.value, 20)))()
+                safeAction(() => game.setDelayTime(e.target.value, 20))()
               }
             />
             <LabelledInput
               label="Transition time"
+              type="range"
+              min={0}
+              max={5}
               value={transitionTime}
               className="transition-input"
               iconName="fa fa-clock-o"
               onChange={(e) => {
-                setTransitionTime(
-                  e.target.value > 0 ? Math.min(e.target.value, 10) : 0
-                )
+                setTransitionTime(e.target.value)
+              }}
+            />
+            <LabelledInput
+              label="Cell size"
+              type="range"
+              min={25}
+              max={40}
+              value={game.cellSize}
+              className="transition-input"
+              iconName="fa fa-circle-thin"
+              onChange={(e) => {
+                game.setCellSize(e.target.value)
               }}
             />
           </div>
-          <div className="button-group">
-            <LabelledButton
-              label="Shuffle"
-              className="shuffle-button"
-              iconName="fa fa-random"
-              onClick={safeAction(() => {
-                setCells(cells.map(randomiseCells))
-              })}
-              disabled={autopilot}
-            />
-            <LabelledButton
-              label="Clear"
-              className="clear-button"
-              iconName="fa fa-trash"
-              onClick={safeAction(() => {
-                setCells(cells.map(resetCells))
-              })}
-              disabled={autopilot}
-            />
+          <div className="button-group ">
+            <div className="button-column">
+              <IconButton
+                className="step-button"
+                iconName="fa fa-step-forward"
+                onClick={() => {
+                  game.setCells(game.iterator.current.next().value)
+                }}
+                disabled={game.autopilot}
+              />
+              <IconButton
+                className="shuffle-button"
+                iconName="fa fa-random"
+                onClick={safeAction(() => {
+                  game.setCells(game.cells.map(randomiseCells))
+                })}
+                disabled={game.autopilot}
+              />
+            </div>
+            <div className="button-column">
+              <IconButton
+                className={`play-button ${game.autopilot ? "stop" : "play"}`}
+                iconName={game.autopilot ? "fa fa-pause" : "fa fa-play"}
+                onClick={async () => {
+                  game.setAutopilot(!game.autopilot)
+                }}
+              />
+              <IconButton
+                className="clear-button"
+                iconName="fa fa-trash"
+                onClick={safeAction(() => {
+                  game.setCells(game.cells.map(resetCells))
+                })}
+                disabled={game.autopilot}
+              />
+            </div>
           </div>
           <div className="button-group vertical">
             <IconButton
               className="shift-up-button"
               iconName="fa fa-arrow-up"
               onClick={safeAction(() => {
-                setCells(shiftBoard(cells, false, cellsPerRow))
+                game.setCells(shiftBoard(game.cells, false, game.cellsPerRow))
               })}
-              disabled={autopilot}
+              disabled={game.autopilot}
             />
             <div>
               <IconButton
                 className="shift-left-button"
                 iconName="fa fa-arrow-left"
                 onClick={safeAction(() => {
-                  setCells(shiftBoard(cells, false))
+                  game.setCells(shiftBoard(game.cells, false))
                 })}
-                disabled={autopilot}
+                disabled={game.autopilot}
               />
               <IconButton
                 className="shift-right-button"
                 iconName="fa fa-arrow-right"
                 onClick={safeAction(() => {
-                  setCells(shiftBoard(cells, true))
+                  game.setCells(shiftBoard(game.cells, true))
                 })}
-                disabled={autopilot}
+                disabled={game.autopilot}
               />
             </div>
             <IconButton
               className="shift-down-button"
               iconName="fa fa-arrow-down"
               onClick={safeAction(() => {
-                setCells(shiftBoard(cells, true, cellsPerRow))
+                game.setCells(shiftBoard(game.cells, true, game.cellsPerRow))
               })}
-              disabled={autopilot}
+              disabled={game.autopilot}
             />
           </div>
         </div>

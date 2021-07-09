@@ -41,6 +41,11 @@ label {
   color: black;
 }
 
+button {
+  min-width: 54px;
+  margin: 2px;
+}
+
 .grid {
   margin-top: 35px;
   background-color: var(--background-color);
@@ -81,22 +86,37 @@ label {
 
 .toolbar.collapsed {
   box-shadow: 0;
-  top: -128px;
+  top: -130px;
   right: 0;
   left: 0;
 }
 
-.labelled-input {
+.input-and-display {
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
 
+.labelled-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.value-display {
+  min-width: 35px;
+  margin-top: 8px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #333333;
+}
+
 .time-control-container,
 .button-group {
   background-color: #d3d3d3;
-  min-height: 80px;
   border: 1px solid black;
   box-shadow: 0px 0px 10px black;
   padding: 8px;
@@ -105,9 +125,12 @@ label {
   justify-content: center;
   display: flex;
 }
-.time-control-container,
 .button-group.vertical {
   flex-direction: column;
+}
+
+.time-control-container {
+  padding: 10px;
 }
 
 .labelled-button {
@@ -121,33 +144,28 @@ label {
   width: 100%;
   display: flex;
   justify-content: space-around;
-  align-items: center;
-  padding: 8px 0px;
+}
+.button-column {
+  display: flex;
+  flex-direction: column;
 }
 
-.transition-input-container,
-.delay-input-container {
+.transition-input-container {
   background-color: #ffffff;
   border: 1px solid gray;
-  padding-left: 8px;
   align-items: center;
   border-radius: 4px;
   display: flex;
   min-height: 25px;
+  padding: 10px;
 }
 
-.transition-input,
-.delay-input {
+.transition-input {
   color: black;
   height: 100%;
   background-color: #ffffff;
   padding-left: 20px;
   border: none;
-}
-
-.play-button.container,
-.clear-button.container {
-  margin-left: 10px;
 }
 
 .play-button.play i:before {
@@ -167,51 +185,78 @@ i:before {
   color: #000000;
 }
 
-@media (max-width: 660px) {
+i.fa-circle-thin,
+i.fa-clock-o,
+i.fa-tachometer {
+  margin-right: 10px;
+}
+
+@media (max-width: 1133px) {
   .toolbar.collapsed {
-    top: -115px;
     right: 0;
     left: 0;
   }
-  i:before {
-    font-size: 14px;
-  }
-  .toolbar {
-    padding: 5px 0px;
+  .input-and-display {
+    min-width: 230px;
   }
 }
-@media (max-width: 660px) {
-  .toolbar.collapsed {
-    top: -134px;
+
+@media (max-width: 988px) {
+  .input-and-display {
+    min-width: 180px;
+  }
+  i::before {
+    font-size: 18px;
+  }
+  input[type="range"] {
+    width: 90px;
   }
 }
-@media (max-width: 598px) {
+
+@media (max-width: 836px) {
+  .input-and-display {
+    min-width: 140px;
+  }
+  input[type="range"] {
+    width: 70px;
+  }
+}
+
+@media (max-width: 720px) {
   .toolbar.collapsed {
     top: -145px;
   }
+  i:before {
+    font-size: 12px;
+  }
+  .button-group {
+    flex-direction: column;
+  }
 }
 
-@media (max-width: 561px) {
+@media (max-width: 652px) {
+  input[type="range"] {
+    width: 70px;
+  }
+  i:before {
+    font-size: 18px;
+  }
   .toolbar.collapsed {
-    top: -158px;
+    top: -285px;
+  }
+  .button-group {
+    flex-direction: row;
+  }
+  .transition-input-container {
+    min-height: 0px;
+    padding: 2px;
   }
   .time-control-container {
-    width: 100px;
-    align-items: center;
-    justify-content: center;
+    padding: 0px;
+    flex-direction: column;
+    padding: 20px;
   }
-  .transition-input-container,
-  .delay-input-container {
-    width: 90px;
-  }
-  .transition-input,
-  .delay-input {
-    width: 50px;
-  }
-}
-
-@media (max-width: 438px) {
-  button {
-    width: 100%;
+  .input-and-display {
+    min-width: 100px;
   }
 }

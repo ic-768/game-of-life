@@ -1,7 +1,7 @@
 import IconInput from "./IconInput"
 
 /**
- *  Simple Icon Input decorated with a label
+ *  Simple Icon Input decorated with a label and optional value display
  */
 const LabelledInput = ({
   label,
@@ -10,16 +10,29 @@ const LabelledInput = ({
   iconName,
   onFocus,
   onChange,
+  onBlur,
+  placeholder,
+  type,
+  min,
+  max,
 }) => (
   <div className="labelled-input">
     <label>{label}</label>
-    <IconInput
-      value={value}
-      className={className}
-      iconName={iconName}
-      onFocus={onFocus}
-      onChange={onChange}
-    />
+    <div className="input-and-display">
+      <IconInput
+        placeholder={placeholder}
+        value={value}
+        type={type}
+        min={min}
+        max={max}
+        className={className}
+        iconName={iconName}
+        onFocus={onFocus}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
+      <div className="value-display">{value}</div>
+    </div>
   </div>
 )
 

@@ -7,16 +7,24 @@ const IconInput = ({
   iconName,
   onFocus,
   onChange,
+  onBlur,
+  placeholder,
+  min,
+  max,
   type = "number",
 }) => (
   <div className={`${className}-container`}>
     <i className={iconName}></i>
     <input
       className={`${className}`}
+      placeholder={placeholder}
       value={value}
       onFocus={onFocus}
       onChange={onChange}
+      onBlur={onBlur}
       type={type}
+      min={min}
+      max={max}
     />
   </div>
 )
