@@ -1,5 +1,12 @@
 import {useState, useRef, useEffect} from "react"
-import {initialiseCells, stepGame} from "./gameFunctions"
+import {
+  initialiseCells,
+  stepGame,
+  randomiseCells,
+  resetCells,
+  shiftBoard,
+  toggleCell,
+} from "./gameFunctions"
 
 /**
  * Custom hook to create game instance
@@ -16,7 +23,18 @@ const useGameOfLife = () => {
   const cellsPerColumn = Math.floor(windowHeight / cellSize) - 1
   const cellsPerRow = Math.floor(windowWidth / cellSize)
   const [cells, setCells] = useState([])
-  const [autopilot, setAutopilot] = useState(false) // if on, run game at delayTime intervals
+  const [isRunning, setIsRunning] = useState(false) // if on, run game at delayTime intervals
+
+  /**
+   *Wrapper to prevent updates while game is running
+   */
+  const safeAction = (action) => () => {
+    if (isRunning) {
+      setIsRunning(false)
+    } else {
+      action()
+    }
+  }
 
   /**
    * Initialise game
@@ -40,21 +58,33 @@ const useGameOfLife = () => {
       await delay(delayTime)
       setCells(iterator.current.next().value || cells)
     }
-    if (autopilot) {
+    if (isRunning) {
       runGame()
     }
-  }, [autopilot, cells, delayTime])
+  }, [isRunning, cells, delayTime])
 
   return {
     cells,
-    setCells,
-    iterator,
-    delayTime,
-    setDelayTime,
     cellSize,
     setCellSize,
-    autopilot,
-    setAutopilot,
+    isRunning,
+    setIsRunning,
+    delayTime,
+    setDelayTime: (t) => safeAction(setDelayTime(t)),
+    playOrPause: () => setIsRunning(!isRunning),
+    stepGame: () => setCells(iterator.current.next().value),
+    resetGameCells: () => setCells(cells.map(resetCells)),
+    randomiseGameCells: () => setCells(cells.map(randomiseCells)),
+    toggleGameCell: (id) =>
+      safeAction(() => {
+        setCells(cells.map(toggleCell(id)))
+      })(),
+    shiftBoardUp: () =>
+      safeAction(setCells(shiftBoard(cells, false, cellsPerRow))),
+    shiftBoardDown: () =>
+      safeAction(setCells(shiftBoard(cells, true, cellsPerRow))),
+    shiftBoardLeft: () => safeAction(setCells(shiftBoard(cells, false))),
+    shiftBoardRight: () => safeAction(setCells(shiftBoard(cells, true))),
   }
 }
 
