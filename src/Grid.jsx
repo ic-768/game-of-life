@@ -1,7 +1,8 @@
-import {useState, useEffect} from "react"
-import {getCellIdFromTouch} from "./gameFunctions"
+import { useState, useEffect } from "react"
+import { getCellIdFromTouch } from "./gameFunctions"
 
-const Grid = ({game, transitionTime}) => {
+const Grid = ({ game, transitionTime }) => {
+  const [lastTouched, setLastTouched] = useState(0) // to prevent unnecessary toggling on touch-devices
   const [isDragging, setIsDragging] = useState(false) // to change state of cells on drag
 
   useEffect(() => {
@@ -23,7 +24,8 @@ const Grid = ({game, transitionTime}) => {
         width: `${window.innerWidth}px`,
         gridTemplateColumns: `repeat(${game.cellsPerRow},1fr)`,
         gridTemplateRows: `repeat(${game.cellsPerColumn},1fr)`,
-      }}>
+      }}
+    >
       {game.cells.map((c, i) => (
         <div
           onMouseOver={() => {
@@ -33,7 +35,9 @@ const Grid = ({game, transitionTime}) => {
           }}
           onTouchMove={(e) => {
             const cellID = getCellIdFromTouch(e)
+            if (lastTouched === cellID) return
             cellID && game.toggleGameCell(cellID)
+            setLastTouched(cellID)
           }}
           onMouseDown={() => game.toggleGameCell(c.id)}
           style={{
@@ -45,7 +49,8 @@ const Grid = ({game, transitionTime}) => {
             height: `${game.cellSize}px`,
           }}
           className={`cell ${c.isActive ? "active" : "inactive"} ${c.id}`}
-          key={i}></div>
+          key={i}
+        ></div>
       ))}
     </div>
   )
