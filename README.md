@@ -31,8 +31,11 @@ clicks on the "play" button in the top left.
 Controls are given for interacting with the aesthetics and speed of the game, as
 well as for shifting the cells around.
 
-## Installing and running the project:
+## Live link
+You can follow [this link](https://r-game-of-life.herokuapp.com/) 
+to check out a live instance of the project
 
+## Installing and running the project:
 To install any missing dependencies:
 
 ### `npm install`
