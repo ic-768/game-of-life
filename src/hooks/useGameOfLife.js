@@ -1,4 +1,5 @@
-import {useState, useRef, useEffect} from "react"
+import { useState, useRef, useEffect } from "react"
+
 import {
   initialiseCells,
   stepGame,
@@ -6,7 +7,7 @@ import {
   resetCells,
   shiftBoard,
   toggleCell,
-} from "./gameFunctions"
+} from "../utils/gameFunctions"
 
 /**
  * Custom hook to create game instance

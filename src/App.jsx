@@ -1,12 +1,14 @@
-import "./App.css";
-import { useState } from "react";
-import useGameOfLife from "./useGameOfLife";
-import Toolbar from "./Toolbar/Toolbar";
-import Grid from "./Grid";
+import { useState } from "react"
+
+import Toolbar from "./Toolbar/Toolbar"
+import Grid from "./Grid/Grid"
+import useGameOfLife from "./hooks/useGameOfLife"
+
+import "./App.css"
 
 function App() {
-  const [transitionTime, setTransitionTime] = useState(1); //time for cell fade-in/out
-  const game = useGameOfLife();
+  const [transitionTime, setTransitionTime] = useState(1) //time for cell fade-in/out
+  const game = useGameOfLife()
 
   return (
     <div className="App">
@@ -17,7 +19,7 @@ function App() {
       />
       <Grid game={game} transitionTime={transitionTime} />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

@@ -150,7 +150,7 @@ button {
   flex-direction: column;
 }
 
-.transition-input-container {
+.slider-input-container {
   background-color: #ffffff;
   border: 1px solid gray;
   align-items: center;
@@ -160,7 +160,7 @@ button {
   padding: 10px;
 }
 
-.transition-input {
+.slider-input {
   color: black;
   height: 100%;
   background-color: #ffffff;
